@@ -1,5 +1,6 @@
 import pygame as pg
 from pygame.draw import *
+from minimax import *
 
 first = True
 user = True
@@ -13,25 +14,6 @@ pg.init()
 pg.display.set_caption('Tic-Tac-Toe')
 screen = pg.display.set_mode((800, 800))
 screen.fill((250, 250, 250))
-
-
-def win():  # determines win based on possible board outcomes
-    global board
-    for row in board:  # horizontals
-        if row[0] == row[1] == row[2]:
-            if row[0] != 0:
-                return True
-    for n in range(3):  # verticals
-        if board[0][n] == board[1][n] == board[2][n]:
-            if board[0][n] != 0:
-                return True
-    if board[0][0] == board[1][1] == board[2][2]:  # diagonal 1
-        if board[1][1] != 0:
-            return True
-    if board[0][2] == board[1][1] == board[2][0]:  # diagonal 2
-        if board[1][1] != 0:
-            return True
-    return False
 
 
 def full():
@@ -114,19 +96,21 @@ def main():
     red = 0
     blue = 0
     while True:
-        while not full() and not win():
+        while not full() and not win(board):
             for event in pg.event.get():
                 if event.type == pg.QUIT:
                     pg.display.quit()
                     exit()
                 lines()
                 pg.display.update()
-                if event.type == pg.MOUSEBUTTONUP:
-                    cross(clean(pg.mouse.get_pos())) if user else circle(clean(pg.mouse.get_pos()))
-                    # this pos will eventually given by minimax alg                     ^^
-                    print(board)
+                if user:
+                    if event.type == pg.MOUSEBUTTONUP:
+                        cross(clean(pg.mouse.get_pos()))
+                        print(board)
+                else:
+                    circle(minimax(board, zeros(board), False)[0])
             pg.display.flip()
-        if win():
+        if win(board):
             if user:
                 red += 1
                 print("Red Wins!")
